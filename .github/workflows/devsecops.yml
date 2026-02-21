@@ -1,0 +1,180 @@
+name: DevSecOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  devsecops:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # =========================================
+    # 1️ CHECKOUT
+    # =========================================
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # =========================================
+    # 2️ INSTALLATION (REPRODUCIBLE)
+    # =========================================
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install users-service
+      run: |
+        cd backend/users-service
+        npm ci
+
+    - name: Install academic-service
+      run: |
+        cd backend/academic-service
+        npm ci
+
+    - name: Install api-gateway
+      run: |
+        cd backend/api-gateway
+        npm ci
+
+    - name: Install frontend
+      run: |
+        cd frontend
+        npm ci
+
+    # =========================================
+    # 3️ QUALITY – ESLint
+    # =========================================
+    - name: Lint users-service
+      run: |
+        cd backend/users-service
+        npx eslint .
+
+    - name: Lint academic-service
+      run: |
+        cd backend/academic-service
+        npx eslint .
+
+    - name: Lint api-gateway
+      run: |
+        cd backend/api-gateway
+        npx eslint .
+
+    - name: Lint frontend
+      run: |
+        cd frontend
+        npx eslint .
+
+    # =========================================
+    # 4️ TESTING
+    # =========================================
+    - name: Test users-service
+      run: |
+        cd backend/users-service
+        npm test
+
+    - name: Test academic-service
+      run: |
+        cd backend/academic-service
+        npm test
+
+    - name: Test api-gateway
+      run: |
+        cd backend/api-gateway
+        npm test
+
+    - name: Test frontend
+      run: |
+        cd frontend
+        npm test
+
+    # =========================================
+    # 5️ SAST – SEMGREP
+    # =========================================
+    - name: Install Semgrep
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install semgrep
+
+    - name: Run Semgrep
+      run: semgrep --config=auto --severity=ERROR
+
+    # =========================================
+    # 6️ SCA – DEPENDENCY SECURITY
+    # =========================================
+    - name: Dependency Review (SCA)
+      uses: actions/dependency-review-action@v4
+      with:
+        fail-on-severity: critical
+
+    - name: npm audit users-service
+      run: |
+        cd backend/users-service
+        npm audit --audit-level=high
+
+    - name: npm audit academic-service
+      run: |
+        cd backend/academic-service
+        npm audit --audit-level=high
+
+    - name: npm audit api-gateway
+      run: |
+        cd backend/api-gateway
+        npm audit --audit-level=high
+
+    - name: npm audit frontend
+      run: |
+        cd frontend
+        npm audit --audit-level=high
+
+    # =========================================
+    # 7️ BUILD DOCKER IMAGES
+    # =========================================
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker images
+      run: |
+        docker compose -f backend/docker-compose.yml build
+
+    # =========================================
+    # 8️ CONTAINER SECURITY – TRIVY
+    # =========================================
+    - name: Trivy scan users-service
+      uses: aquasecurity/trivy-action@0.20.0
+      with:
+        image-ref: users-service
+        severity: CRITICAL,HIGH
+        exit-code: 1
+
+    - name: Trivy scan academic-service
+      uses: aquasecurity/trivy-action@0.20.0
+      with:
+        image-ref: academic-service
+        severity: CRITICAL,HIGH
+        exit-code: 1
+
+    - name: Trivy scan api-gateway
+      uses: aquasecurity/trivy-action@0.20.0
+      with:
+        image-ref: api-gateway
+        severity: CRITICAL,HIGH
+        exit-code: 1
+
+    # =========================================
+    # 9️ SMOKE TEST
+    # =========================================
+    - name: Run docker-compose
+      run: |
+        docker compose -f backend/docker-compose.yml up -d
+        sleep 15
+
+    - name: Smoke test API Gateway
+      run: curl http://localhost:3000/health
+
+    - name: Shutdown services
+      if: always()
+      run: docker compose -f backend/docker-compose.yml down
