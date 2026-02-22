@@ -92,7 +92,7 @@ jobs:
 
     - name: Run Semgrep SAST
       run: |
-        semgrep --config=auto --error --exclude k8s/ --exclude-rule express-check-csurf-middleware-usage
+        semgrep --config=auto --error
 
     # =========================
     # 7. SCA – Dependency Review (Gate real)
