@@ -7,9 +7,9 @@ export default [
     },
     rules: {
       "no-unused-vars": "error",
-      "no-console": "warn",
       "eqeqeq": "error",
-      "no-eval": "error"
+      "no-eval": "error",
+      "no-console": "off"
     }
   }
 ];
