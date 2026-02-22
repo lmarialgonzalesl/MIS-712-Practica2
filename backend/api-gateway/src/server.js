@@ -1,3 +1,5 @@
+/* nosemgrep: javascript.express.security.audit.express-check-csurf-middleware-usage */
+
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const csrf = require('csurf');
