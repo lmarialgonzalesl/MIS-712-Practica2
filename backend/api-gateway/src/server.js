@@ -1,36 +1,17 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const { createProxyMiddleware } = require("http-proxy-middleware");
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const csrf = require('csurf');
+
 const app = express();
 
-app.use(cors());
-//app.use(express.json());
+app.use(cookieParser());
+app.use(express.json());
 
-// Health check (DevSecOps)
-app.get("/health", (_req, res) => {
-  res.json({ status: "api-gateway OK" });
-});
+const csrfProtection = csrf({ cookie: true });
 
-// AUTH → users-service
-app.use(
-  "/auth",
-  createProxyMiddleware({
-    target: "http://users-service:3001",
-    changeOrigin: true,
-  })
-);
+app.use(csrfProtection);
 
-// COURSES → academic-service
-app.use(
-  "/courses",
-  createProxyMiddleware({
-    target: "http://academic-service:3002",
-    changeOrigin: true,
-  })
-);
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🌐 API Gateway running on port ${PORT}`);
+// Endpoint ejemplo
+app.get('/csrf-token', (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
 });
