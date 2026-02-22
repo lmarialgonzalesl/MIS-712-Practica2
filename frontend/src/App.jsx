@@ -1,6 +1,4 @@
 import { useState } from "react";
-import Login from "./pages/Login";
-import Courses from "./pages/Courses";
 
 export default function App() {
   // Revisar si ya existe token

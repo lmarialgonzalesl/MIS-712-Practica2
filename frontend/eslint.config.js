@@ -12,27 +12,28 @@ export default [
       sourceType: "module",
       parserOptions: {
         ecmaFeatures: {
-          jsx: true
-        }
+          jsx: true,
+        },
       },
       globals: {
         window: "readonly",
         document: "readonly",
         sessionStorage: "readonly",
         localStorage: "readonly",
-        console: "readonly"
-      }
+        console: "readonly",
+        fetch: "readonly",
+      },
     },
     plugins: {
       react: reactPlugin,
-      "react-hooks": reactHooks
+      "react-hooks": reactHooks,
     },
     rules: {
       "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "no-eval": "error",
-      "eqeqeq": "error",
-      "react/react-in-jsx-scope": "off"
-    }
+      eqeqeq: "error",
+      "react/react-in-jsx-scope": "off",
+    },
   },
 
   // Jest
@@ -43,16 +44,16 @@ export default [
         test: "readonly",
         expect: "readonly",
         describe: "readonly",
-        it: "readonly"
-      }
-    }
+        it: "readonly",
+      },
+    },
   },
 
   // Cypress
   {
     files: ["cypress.config.js"],
     rules: {
-      "no-unused-vars": "off"
-    }
-  }
+      "no-unused-vars": "off",
+    },
+  },
 ];
