@@ -29,9 +29,10 @@ export default [
       "react-hooks": reactHooks,
     },
     rules: {
-      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      "no-unused-vars": "off",
+      "react/jsx-uses-vars": "error",
       "no-eval": "error",
-      eqeqeq: "error",
+      "eqeqeq": "error",
       "react/react-in-jsx-scope": "off",
     },
   },
