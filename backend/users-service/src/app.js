@@ -2,8 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/auth.routes");
 
-// nosemgrep: express-check-csurf-middleware-usage
-// Justification: API REST stateless using JWT in Authorization header (no cookie-based sessions)
+// nosemgrep: javascript.express.security.audit.express-check-csurf-middleware-usage
 const app = express();
 
 app.use(cors());
