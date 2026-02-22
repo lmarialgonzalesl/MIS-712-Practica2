@@ -151,7 +151,7 @@ A continuación se muestra evidencia de una ejecución exitosa del pipeline en G
 
 ### Ejecución exitosa
 
-![Pipeline ejecutándose correctamente](docs/pipeline-success.png)
+![Pipeline ejecutándose correctamente](docs/pipeline-success.png.png)
 
 ![Pipeline ejecutándose correctamente](docs/pipeline-success2.png)
 
