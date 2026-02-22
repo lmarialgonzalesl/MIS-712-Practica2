@@ -2,7 +2,9 @@
 
 ## Pipeline CI/CD con Enfoque DevSecOps
 
-Repositorio: MIS-712-Practica2
+El código fuente y el pipeline DevSecOps implementado se encuentran disponibles en el siguiente repositorio público:
+**MIS-712-Practica2**  
+https://github.com/lmarialgonzalesl/MIS-712-Practica2
 
 ## 1. Introducción
 
