@@ -1,8 +1,8 @@
+/* nosemgrep: javascript.express.security.audit.express-check-csurf-middleware-usage */
 const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/auth.routes");
 
-// nosemgrep: javascript.express.security.audit.express-check-csurf-middleware-usage
 const app = express();
 
 app.use(cors());

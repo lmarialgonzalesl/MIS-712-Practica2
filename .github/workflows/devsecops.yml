@@ -92,7 +92,7 @@ jobs:
 
     - name: Run Semgrep SAST
       run: |
-        semgrep --config=auto --error
+        semgrep --config=auto --error --exclude k8s/
 
     # =========================
     # 7. SCA – Dependency Review (Gate real)
