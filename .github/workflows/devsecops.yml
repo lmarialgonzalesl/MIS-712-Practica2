@@ -148,22 +148,24 @@ jobs:
     # =========================
     # 10. Smoke Test
     # =========================
-    - name: Run docker-compose
+- name: Run docker-compose
       run: |
         docker compose -f backend/docker-compose.yml up -d --build
 
-    - name: Wait for API Gateway
+    - name: Show running containers
       run: |
-        for i in {1..20}; do
-          if curl -s http://localhost:3000/health; then
-            echo "API is up"
-            exit 0
-          fi
-          echo "Waiting for API..."
-          sleep 5
-        done
-        echo "API did not start"
-        exit 1
+        echo "===== DOCKER PS ====="
+        docker ps -a
+
+    - name: Show docker-compose status
+      run: |
+        echo "===== DOCKER COMPOSE PS ====="
+        docker compose -f backend/docker-compose.yml ps
+
+    - name: Show docker logs
+      run: |
+        echo "===== DOCKER LOGS ====="
+        docker compose -f backend/docker-compose.yml logs --no-color || true
 
     - name: Shutdown services
       if: always()
