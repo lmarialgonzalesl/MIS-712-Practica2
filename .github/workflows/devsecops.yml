@@ -148,7 +148,7 @@ jobs:
     # =========================
     # 10. Smoke Test
     # =========================
-- name: Run docker-compose
+    - name: Run docker-compose
       run: |
         docker compose -f backend/docker-compose.yml up -d --build
 
