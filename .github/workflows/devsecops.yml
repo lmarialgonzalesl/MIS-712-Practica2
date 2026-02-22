@@ -98,6 +98,7 @@ jobs:
     # 7. SCA – Dependency Review (Gate real)
     # =========================
     - name: Dependency Review
+      if: github.event_name == 'pull_request'
       uses: actions/dependency-review-action@v4
       with:
         fail-on-severity: critical
