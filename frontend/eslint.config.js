@@ -1,28 +1,41 @@
 import js from "@eslint/js";
+import reactPlugin from "eslint-plugin-react";
+import reactHooks from "eslint-plugin-react-hooks";
 
 export default [
   js.configs.recommended,
 
-  // React + browser
   {
-    files: ["**/*.js", "**/*.jsx"],
+    files: ["**/*.{js,jsx}"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        }
+      },
       globals: {
         window: "readonly",
         document: "readonly",
+        sessionStorage: "readonly",
+        localStorage: "readonly",
         console: "readonly"
       }
+    },
+    plugins: {
+      react: reactPlugin,
+      "react-hooks": reactHooks
     },
     rules: {
       "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "no-eval": "error",
-      "eqeqeq": "error"
+      "eqeqeq": "error",
+      "react/react-in-jsx-scope": "off"
     }
   },
 
-  // Jest environment
+  // Jest
   {
     files: ["**/__tests__/**/*.js", "**/*.test.js"],
     languageOptions: {
@@ -35,7 +48,7 @@ export default [
     }
   },
 
-  // Cypress config (allow unused args)
+  // Cypress
   {
     files: ["cypress.config.js"],
     rules: {
