@@ -1,123 +1,174 @@
-## Enfoque de la práctica
-Esta práctica debe ser implementada, no solo diseñada.
-El objetivo es aplicar DevSecOps de manera práctica, integrando:
-        - - Front-end
-        - - Back-end
-        - - Inicio de sesión seguro
-        - - Arquitectura de microservicios
-        - - Automatización CI/CD con seguridad embebida
-     
+# Documento de Justificación Técnica
 
-# 1. Adición del Front-end
+## Pipeline CI/CD con Enfoque DevSecOps
 
-[ Front-end ]
-     |
-     | Login / JWT
-     v
-[ users-service ]
-     |
-     | JWT
-     v
-[ api-gateway ]
-     |
-     v
-[ academic-service ]
+Repositorio: MIS-712-Practica2
 
+## 1. Introducción
 
-## Integración DevSecOps (obligatoria)
-El Front-end y el inicio de sesión deben estar cubiertos por el pipeline DevSecOps existente:
+El presente documento justifica técnicamente el diseño e implementación
+del pipeline CI/CD desarrollado para el repositorio MIS-712-Practica2,
+conforme a los requerimientos de la Tarea 2.
 
-- SAST: análisis del código de autenticación y manejo de inputs.
-- SCA: análisis de dependencias relacionadas con seguridad.
-- DAST: pruebas de acceso no autorizado a endpoints protegidos.
+El pipeline implementa un enfoque DevSecOps integrando controles
+automáticos de calidad, pruebas, seguridad de código, análisis de
+dependencias y seguridad de contenedores, garantizando que el código
+solo avance si cumple criterios funcionales y de seguridad.
 
-**El login no se asume seguro, se valida automáticamente
+Secuencia implementada:
 
-## Propósito de esta extensión
-Consolidar una visión end-to-end DevSecOps, donde:
- - El diseño,
- - La seguridad,
- - La automatización,
-  Y la experiencia de usuario,
-se integran desde las primeras etapas del desarrollo.
+Code → Build → Test → Security → Container Security → Validation
 
-## Pipeline 
-Commit / Pull Request
-   ↓
-Tests automatizados
-   ↓
-SAST (Semgrep)
-   ↓
-Build (Docker)
-   ↓
-SCA (dependencias)
-   ↓
-Deploy automático
-   ↓
-DAST (aplicación en ejecución)
+------------------------------------------------------------------------
+## 2. Diseño Global del Pipeline
 
-## Docker Compose
-docker-compose down
-docker-compose up --build
+El pipeline ejecuta las siguientes etapas:
 
-## Estructura del Pipeline
-Push / Pull Request
-   ↓
-Install dependencies
-   ↓
-Tests (backend + frontend)
-   ↓
-SAST (Semgrep)
-   ↓
-Build Docker images
-   ↓
-SCA (Trivy)
-   ↓
-docker-compose up
-   ↓
-Smoke tests
+1.  Checkout del repositorio\
+2.  Instalación reproducible de dependencias\
+3.  Análisis de calidad de código (Lint)\
+4.  Testing automático\
+5.  Análisis estático de seguridad (SAST)\
+6.  Análisis de dependencias (SCA)\
+7.  Build de imágenes Docker\
+8.  Escaneo de seguridad de contenedores\
+9.  Validación mediante Docker Compose
 
-## Kubernetes
-kubectl apply -f k8s/users-service/
-kubectl apply -f k8s/academic-service/
-kubectl apply -f k8s/api-gateway/
+Cada etapa depende del éxito de la anterior, funcionando como un sistema
+automático de control.
 
-kubectl get pods
-kubectl get services
+------------------------------------------------------------------------
+## 3. Justificación Técnica por Etapa
 
-# Correr api-gateway
-minikube service api-gateway
-minikube start
-# Trabajar con Docker
-eval $(minikube docker-env -u)
-# Trabajar Docker dentro Kubernetes
-1. minikube start --driver=docker
-   eval $(minikube docker-env)
-2. minikube status
-3. kubectl config current-context
-4. kubectl get nodes
-## Construir las imágenes
-docker build -t frontend:latest ../frontend
-kubectl get pods -n backend
-docker build -t users-service:latest ../backend/users-service
+### 3.1 Instalación Reproducible
 
-## Desplegar en Kubernetes
-kubectl apply -f k8s/namespace.yaml
-kubectl apply -f k8s/users-service/
-kubectl apply -f k8s/academic-service/
-kubectl apply -f k8s/api-gateway/
-kubectl apply -f k8s/frontend/
+Herramienta: npm ci\
+Fase DevSecOps: Build\
+Riesgo mitigado: inconsistencias entre entornos y versiones no
+controladas.
 
-# eliminar cluster
-minikube delete
+Se utiliza npm ci para garantizar builds determinísticos usando
+package-lock.json. Sin esta práctica podrían existir fallos distintos
+entre desarrollo y producción.
 
+------------------------------------------------------------------------
+### 3.2 Análisis de Calidad de Código
 
-minikube start
-eval $(minikube docker-env)
+Herramienta: ESLint\
+Fase DevSecOps: Code\
+Riesgo mitigado: malas prácticas y errores potenciales.
 
-docker build -t users-service backend/users-service
-docker build -t academic-service backend/academic-service
-docker build -t api-gateway backend/api-gateway
-docker build -t frontend frontend
+El análisis estático detecta problemas antes de ejecutar el código. El
+pipeline falla si existen errores, actuando como gate automático.
 
-kubectl apply -f k8s/
+------------------------------------------------------------------------
+
+### 3.3 Testing Automatizado
+
+Herramienta: npm test\
+Fase DevSecOps: Test\
+Riesgo mitigado: regresiones y funcionalidades rotas.
+
+Las pruebas garantizan que el comportamiento del sistema se mantenga
+tras cada cambio. El pipeline se detiene si fallan.
+
+------------------------------------------------------------------------
+
+### 3.4 Seguridad del Código (SAST)
+
+Herramienta: Semgrep\
+Fase DevSecOps: Security (Shift Left)\
+Riesgo mitigado: vulnerabilidades en código fuente.
+
+Permite detectar patrones inseguros antes del despliegue, reduciendo el
+costo de corrección.
+
+------------------------------------------------------------------------
+
+### 3.5 Seguridad de Dependencias (SCA)
+
+Herramienta: GitHub Dependency Review\
+Fase DevSecOps: Security\
+Riesgo mitigado: vulnerabilidades conocidas (CVEs) en librerías
+externas.
+
+Muchas vulnerabilidades provienen de dependencias. Esta herramienta
+bloquea PR con riesgos críticos.
+
+------------------------------------------------------------------------
+
+### 3.6 Build de Contenedores
+
+Herramienta: Docker / Docker Buildx\
+Fase DevSecOps: Build\
+Riesgo mitigado: artefactos inconsistentes y falta de trazabilidad.
+
+Las imágenes se construyen automáticamente y se versionan por SHA,
+garantizando reproducibilidad.
+
+------------------------------------------------------------------------
+
+### 3.7 Seguridad de Contenedores
+
+Herramienta: Trivy\
+Fase DevSecOps: Security (Container Security)\
+Riesgo mitigado: vulnerabilidades en imágenes base y sistema operativo.
+
+Incluso con código seguro, la imagen puede contener CVEs. Trivy detecta
+vulnerabilidades críticas.
+
+------------------------------------------------------------------------
+
+### 3.8 Validación de Integración
+
+Herramienta: Docker Compose\
+Fase DevSecOps: Validation\
+Riesgo mitigado: fallos de integración entre servicios.
+
+Levantar los servicios permite verificar que el sistema completo
+funciona correctamente.
+
+------------------------------------------------------------------------
+
+## 4. Gates de Seguridad
+
+El pipeline bloquea automáticamente el avance si:
+
+-   Falla la instalación reproducible.\
+-   Falla el lint.\
+-   Falla un test.\
+-   Se detectan vulnerabilidades críticas en SAST.\
+-   Se detectan CVEs críticos en dependencias.\
+-   Se detectan vulnerabilidades críticas en imágenes Docker.
+
+Esto demuestra que los controles no son informativos, sino obligatorios.
+
+------------------------------------------------------------------------
+
+## 5. Evidencia de Ejecución del Pipeline
+
+A continuación se muestra evidencia de una ejecución exitosa del pipeline en GitHub Actions, donde todas las etapas fueron completadas correctamente.
+
+### Ejecución exitosa
+
+![Pipeline ejecutándose correctamente](docs/pipeline-success.png)
+
+![Pipeline ejecutándose correctamente](docs/pipeline-success2.png)
+
+En esta ejecución se verifica que:
+
+- Todas las etapas fueron ejecutadas.
+- No se detectaron vulnerabilidades críticas.
+- Los tests pasaron correctamente.
+- Las imágenes Docker fueron construidas.
+- El escaneo de seguridad de contenedores fue exitoso.
+------------------------------------------------------------------------
+
+## 6. Conclusión
+
+El pipeline implementado en MIS-712-Practica2 integra calidad, seguridad
+y automatización en todo el ciclo de desarrollo.
+
+Aunque el sistema sea funcional, la funcionalidad no garantiza seguridad
+ni estabilidad futura. El enfoque DevSecOps aplicado asegura evolución
+controlada, trazable y profesional del software.
