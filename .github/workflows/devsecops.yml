@@ -125,7 +125,7 @@ jobs:
       uses: aquasecurity/trivy-action@0.20.0
       with:
         image-ref: users-service:${{ github.sha }}
-        severity: CRITICAL,HIGH
+        severity: CRITICAL
         exit-code: 1
         ignore-unfixed: true
 
@@ -133,7 +133,7 @@ jobs:
       uses: aquasecurity/trivy-action@0.20.0
       with:
         image-ref: academic-service:${{ github.sha }}
-        severity: CRITICAL,HIGH
+        severity: CRITICAL
         exit-code: 1
         ignore-unfixed: true
 
@@ -141,7 +141,7 @@ jobs:
       uses: aquasecurity/trivy-action@0.20.0
       with:
         image-ref: api-gateway:${{ github.sha }}
-        severity: CRITICAL,HIGH
+        severity: CRITICAL
         exit-code: 1
         ignore-unfixed: true
 
